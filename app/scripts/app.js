@@ -77,7 +77,6 @@ module.exports = Backbone.Marionette.ItemView.extend({
         if(this.model.isValid(true)) {
             this.collection.create(this.model);
             this.ui.inputs.val('');
-            alert('Success!');
         }
     },
     bindBackboneValidation: function() {
@@ -130,7 +129,6 @@ module.exports = Backbone.Marionette.ItemView.extend({
         if(this.model.isValid(true)) {
             this.collection.create(this.model);
             this.ui.inputs.val('');
-            alert('Success!');
         }
     },
     bindBackboneValidation: function() {
@@ -204,7 +202,6 @@ module.exports = Backbone.Marionette.ItemView.extend({
         if(this.model.isValid(true)) {
             this.collection.create(this.model);
             this.ui.inputs.val('');
-            alert('Success!');
         }
     },
     bindBackboneValidation: function() {
@@ -257,7 +254,6 @@ module.exports = Backbone.Marionette.ItemView.extend({
         if(this.model.isValid(true)) {
             this.collection.create(this.model);
             this.ui.inputs.val('');
-            alert('Success!');
         }
     },
     bindBackboneValidation: function() {
@@ -287,6 +283,7 @@ var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
 
 module.exports = Backbone.Marionette.ItemView.extend({
+    tagName: 'p',
     template: '#user_view'
 });
 
@@ -295,10 +292,10 @@ var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
 var UserView = require('./UserView');
 
-module.exports = Backbone.Marionette.CompositeView.extend({
+module.exports = Backbone.Marionette.CollectionView.extend({
+    id: 'user_list',
     childView: UserView,
-    childViewContainer: '#users_list',
-    template: '#users_view'
+    childViewContainer: '#users_list'
 });
 
 },{"./UserView":9,"backbone":"backbone","backbone.marionette":13}],11:[function(require,module,exports){

@@ -2,8 +2,8 @@ var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
 var UserView = require('./UserView');
 
-module.exports = Backbone.Marionette.CompositeView.extend({
+module.exports = Backbone.Marionette.CollectionView.extend({
+    id: 'user_list',
     childView: UserView,
-    childViewContainer: '#users_list',
-    template: '#users_view'
+    childViewContainer: '#users_list'
 });
