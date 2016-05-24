@@ -8,29 +8,32 @@ module.exports = Backbone.Collection.extend({
     localStorage: new Backbone.LocalStorage('backbone_validation_sample'),
 });
 
-},{"../models/User":3,"backbone":"backbone","backbone.LocalStorage":6}],2:[function(require,module,exports){
+},{"../models/User":3,"backbone":"backbone","backbone.LocalStorage":11}],2:[function(require,module,exports){
 var $ = jQuery = require('jquery');
 require('bootstrap');
 var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
 var Users = require('./collections/Users');
 var UsersView = require('./views/UsersView');
+var FormsView = require('./views/FormsView');
 
 var App = new Backbone.Marionette.Application({
     regions: {
-        main: '#main'
+        users: '#users',
+        forms: '#forms'
     },
     onStart: function() {
-        var users = new Users();
-        users.fetch().done(function() {
-            this.getRegion('main').show(new UsersView({collection: users}));
+        var usersCollection = new Users();
+        usersCollection.fetch().done(function() {
+            this.getRegion('users').show(new UsersView({collection: usersCollection}));
+            this.getRegion('forms').show(new FormsView({collection: usersCollection}));
         }.bind(this));
     }
 });
 
 App.start();
 
-},{"./collections/Users":1,"./views/UsersView":5,"backbone":"backbone","backbone.marionette":8,"bootstrap":"bootstrap","jquery":"jquery"}],3:[function(require,module,exports){
+},{"./collections/Users":1,"./views/FormsView":6,"./views/UsersView":10,"backbone":"backbone","backbone.marionette":13,"bootstrap":"bootstrap","jquery":"jquery"}],3:[function(require,module,exports){
 var Backbone = require('backbone');
 
 module.exports = Backbone.Model.extend({
@@ -49,49 +52,26 @@ module.exports = Backbone.Model.extend({
 },{"backbone":"backbone"}],4:[function(require,module,exports){
 var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
-
-module.exports = Backbone.Marionette.ItemView.extend({
-    template: '#user_view'
-});
-
-},{"backbone":"backbone","backbone.marionette":8}],5:[function(require,module,exports){
-var Backbone = require('backbone');
-Backbone.Marionette = require('backbone.marionette');
 Backbone.Validation = require('backbone.validation');
 var User = require('../models/User');
-var UserView = require('./UserView');
 
-module.exports = Backbone.Marionette.CompositeView.extend({
-    childView: UserView,
-    childViewContainer: '#users_list',
-    template: '#users_view',
+module.exports = Backbone.Marionette.ItemView.extend({
+    className: 'panel panel-success',
+    template: '#basic_form_view',
     ui: {
-        inputName: '#name',
-        inputAge: '#age',
+        inputName: 'input.name',
+        inputAge: 'input.age',
         inputs: 'input',
-        submitBtn: '#submit'
+        submitBtn: 'button.submit'
     },
     events: {
         'click @ui.submitBtn': 'clickSubmitBtn'
     },
     clickSubmitBtn: function() {
-        var name = this.ui.inputName.val();
-        var age = this.ui.inputAge.val();
+        var name = this.ui.inputName.val().trim();
+        var age = this.ui.inputAge.val().trim();
         this.model = new User();
-
-        Backbone.Validation.bind(this, {
-            valid: function(view, attr) {
-                var input = view.$('[name=' + attr + ']')
-                input.next('.help-inline').remove();
-            },
-            invalid: function(view, attr, error) {
-                var input = view.$('[name=' + attr + ']')
-                if(input.next('.help-inline').length == 0) {
-                    input.after('<span class=\"help-inline\" style=\"color:red\"></span>');
-                }
-                input.next('.help-inline').text(error);
-            }
-        });
+        this.bindBackboneValidation();
 
         this.model.set({name: name, age: age});
         if(this.model.isValid(true)) {
@@ -99,11 +79,229 @@ module.exports = Backbone.Marionette.CompositeView.extend({
             this.ui.inputs.val('');
             alert('Success!');
         }
+    },
+    bindBackboneValidation: function() {
+        Backbone.Validation.bind(this, {
+            valid: function(view, attr) {
+                var control = view.$('[name=' + attr + ']');
+                var group = control.closest('.form-group');
+                group.removeClass('has-error');
+                group.find('.help-block').remove();
+            },
+            invalid: function(view, attr, error) {
+                var control = view.$('[name=' + attr + ']');
+                var group = control.closest('.form-group');
+                group.addClass('has-error');
+                if(group.find('.help-block').length == 0) {
+                    control.after('<p class=\"help-block\"></p>');
+                }
+                var target = group.find('.help-block');
+                target.text(error);
+            }
+        });
     }
 });
 
+},{"../models/User":3,"backbone":"backbone","backbone.marionette":13,"backbone.validation":"backbone.validation"}],5:[function(require,module,exports){
+var Backbone = require('backbone');
+Backbone.Marionette = require('backbone.marionette');
+Backbone.Validation = require('backbone.validation');
+var User = require('../models/User');
 
-},{"../models/User":3,"./UserView":4,"backbone":"backbone","backbone.marionette":8,"backbone.validation":"backbone.validation"}],6:[function(require,module,exports){
+module.exports = Backbone.Marionette.ItemView.extend({
+    className: 'panel panel-success',
+    template: '#basic_form_view',
+    ui: {
+        inputName: 'input.name',
+        inputAge: 'input.age',
+        inputs: 'input',
+        submitBtn: 'button.submit'
+    },
+    events: {
+        'click @ui.submitBtn': 'clickSubmitBtn'
+    },
+    clickSubmitBtn: function() {
+        var name = this.ui.inputName.val().trim();
+        var age = this.ui.inputAge.val().trim();
+        this.model = new User();
+        this.bindBackboneValidation();
+
+        this.model.set({name: name, age: age});
+        if(this.model.isValid(true)) {
+            this.collection.create(this.model);
+            this.ui.inputs.val('');
+            alert('Success!');
+        }
+    },
+    bindBackboneValidation: function() {
+        Backbone.Validation.bind(this, {
+            valid: function(view, attr) {
+                var control = view.$('[name=' + attr + ']');
+                var group = control.closest('.form-group');
+                group.removeClass('has-error');
+                if(control.next('.tooltip')) control.tooltip('hide');
+            },
+            invalid: function(view, attr, error) {
+                var control = view.$('[name=' + attr + ']');
+                var group = control.closest('.form-group');
+                group.addClass('has-error');
+                control.tooltip({trigger: 'manual', title: error}).tooltip('show');
+            }
+        });
+    }
+});
+
+},{"../models/User":3,"backbone":"backbone","backbone.marionette":13,"backbone.validation":"backbone.validation"}],6:[function(require,module,exports){
+var Backbone = require('backbone');
+Backbone.Marionette = require('backbone.marionette');
+var BasicFormView = require('./BasicFormView');
+var HorizontalFormView = require('./HorizontalFormView');
+var BasicFormWithTooltipView = require('./BasicFormWithTooltipView');
+var InlineFormView = require('./InlineFormView');
+
+module.exports = Backbone.Marionette.LayoutView.extend({
+    className: 'row',
+    template: '#forms_view',
+    regions: {
+        basicForm: '#basic_form',
+        horizontalForm: '#horizontal_form',
+        basicFormWithTooltip: '#basic_form_with_tooltip',
+        inlineForm: '#inline_form'
+    },
+    onRender: function() {
+        this.getRegion('basicForm').show(new BasicFormView({collection: this.collection}));
+        this.getRegion('horizontalForm').show(new HorizontalFormView({collection: this.collection}));
+        this.getRegion('basicFormWithTooltip').show(new BasicFormWithTooltipView({collection: this.collection}));
+        this.getRegion('inlineForm').show(new InlineFormView({collection: this.collection}));
+    }
+});
+
+},{"./BasicFormView":4,"./BasicFormWithTooltipView":5,"./HorizontalFormView":7,"./InlineFormView":8,"backbone":"backbone","backbone.marionette":13}],7:[function(require,module,exports){
+var Backbone = require('backbone');
+Backbone.Marionette = require('backbone.marionette');
+Backbone.Validation = require('backbone.validation');
+var User = require('../models/User');
+
+module.exports = Backbone.Marionette.ItemView.extend({
+    className: 'panel panel-success',
+    template: '#horizontal_form_view',
+    ui: {
+        inputName: 'input.name',
+        inputAge: 'input.age',
+        inputs: 'input',
+        submitBtn: 'button.submit'
+    },
+    events: {
+        'click @ui.submitBtn': 'clickSubmitBtn'
+    },
+    clickSubmitBtn: function() {
+        var name = this.ui.inputName.val().trim();
+        var age = this.ui.inputAge.val().trim();
+        this.model = new User();
+        this.bindBackboneValidation();
+
+        this.model.set({name: name, age: age});
+        if(this.model.isValid(true)) {
+            this.collection.create(this.model);
+            this.ui.inputs.val('');
+            alert('Success!');
+        }
+    },
+    bindBackboneValidation: function() {
+        Backbone.Validation.bind(this, {
+            valid: function(view, attr) {
+                var control = view.$('[name=' + attr + ']');
+                var group = control.closest('.form-group');
+                group.removeClass('has-error');
+                group.find('.help-block').remove();
+            },
+            invalid: function(view, attr, error) {
+                var control = view.$('[name=' + attr + ']');
+                var group = control.closest('.form-group');
+                group.addClass('has-error');
+                if(group.find('.help-block').length == 0) {
+                    control.after('<p class=\"help-block\"></p>');
+                }
+                var target = group.find('.help-block');
+                target.text(error);
+            }
+        });
+    }
+});
+
+},{"../models/User":3,"backbone":"backbone","backbone.marionette":13,"backbone.validation":"backbone.validation"}],8:[function(require,module,exports){
+var Backbone = require('backbone');
+Backbone.Marionette = require('backbone.marionette');
+Backbone.Validation = require('backbone.validation');
+var User = require('../models/User');
+
+module.exports = Backbone.Marionette.ItemView.extend({
+    className: 'panel panel-success',
+    template: '#inline_form_view',
+    ui: {
+        inputName: 'input.name',
+        inputAge: 'input.age',
+        inputs: 'input',
+        submitBtn: 'button.submit'
+    },
+    events: {
+        'click @ui.submitBtn': 'clickSubmitBtn'
+    },
+    clickSubmitBtn: function() {
+        var name = this.ui.inputName.val().trim();
+        var age = this.ui.inputAge.val().trim();
+        this.model = new User();
+        this.bindBackboneValidation();
+
+        this.model.set({name: name, age: age});
+        if(this.model.isValid(true)) {
+            this.collection.create(this.model);
+            this.ui.inputs.val('');
+            alert('Success!');
+        }
+    },
+    bindBackboneValidation: function() {
+        Backbone.Validation.bind(this, {
+            valid: function(view, attr) {
+                var control = view.$('[name=' + attr + ']');
+                var group = control.closest('.form-group');
+                group.removeClass('has-error');
+                group.find('.help-inline').remove();
+            },
+            invalid: function(view, attr, error) {
+                var control = view.$('[name=' + attr + ']');
+                var group = control.closest('.form-group');
+                group.addClass('has-error');
+                if(group.find('.help-inline').length == 0) {
+                    control.after('<span class=\"help-inline text-danger\"></span>');
+                }
+                var target = group.find('.help-inline');
+                target.text(error);
+            }
+        });
+    }
+});
+
+},{"../models/User":3,"backbone":"backbone","backbone.marionette":13,"backbone.validation":"backbone.validation"}],9:[function(require,module,exports){
+var Backbone = require('backbone');
+Backbone.Marionette = require('backbone.marionette');
+
+module.exports = Backbone.Marionette.ItemView.extend({
+    template: '#user_view'
+});
+
+},{"backbone":"backbone","backbone.marionette":13}],10:[function(require,module,exports){
+var Backbone = require('backbone');
+Backbone.Marionette = require('backbone.marionette');
+var UserView = require('./UserView');
+
+module.exports = Backbone.Marionette.CompositeView.extend({
+    childView: UserView,
+    childViewContainer: '#users_list',
+    template: '#users_view'
+});
+
+},{"./UserView":9,"backbone":"backbone","backbone.marionette":13}],11:[function(require,module,exports){
 /**
  * Backbone localStorage Adapter
  * Version 1.1.16
@@ -363,7 +561,7 @@ Backbone.sync = function(method, model, options) {
 return Backbone.LocalStorage;
 }));
 
-},{"backbone":"backbone"}],7:[function(require,module,exports){
+},{"backbone":"backbone"}],12:[function(require,module,exports){
 // Backbone.BabySitter
 // -------------------
 // v0.1.11
@@ -555,7 +753,7 @@ return Backbone.LocalStorage;
 
 }));
 
-},{"backbone":"backbone","underscore":"underscore"}],8:[function(require,module,exports){
+},{"backbone":"backbone","underscore":"underscore"}],13:[function(require,module,exports){
 // MarionetteJS (Backbone.Marionette)
 // ----------------------------------
 // v2.4.5
@@ -4066,7 +4264,7 @@ return Backbone.LocalStorage;
   return Marionette;
 }));
 
-},{"backbone":"backbone","backbone.babysitter":7,"backbone.wreqr":9,"underscore":"underscore"}],9:[function(require,module,exports){
+},{"backbone":"backbone","backbone.babysitter":12,"backbone.wreqr":14,"underscore":"underscore"}],14:[function(require,module,exports){
 // Backbone.Wreqr (Backbone.Marionette)
 // ----------------------------------
 // v1.3.6
@@ -4503,7 +4701,7 @@ return Backbone.LocalStorage;
 
 }));
 
-},{"backbone":"backbone","underscore":"underscore"}],10:[function(require,module,exports){
+},{"backbone":"backbone","underscore":"underscore"}],15:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: affix.js v3.3.6
  * http://getbootstrap.com/javascript/#affix
@@ -4667,7 +4865,7 @@ return Backbone.LocalStorage;
 
 }(jQuery);
 
-},{}],11:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: alert.js v3.3.6
  * http://getbootstrap.com/javascript/#alerts
@@ -4763,7 +4961,7 @@ return Backbone.LocalStorage;
 
 }(jQuery);
 
-},{}],12:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: button.js v3.3.6
  * http://getbootstrap.com/javascript/#buttons
@@ -4885,7 +5083,7 @@ return Backbone.LocalStorage;
 
 }(jQuery);
 
-},{}],13:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: carousel.js v3.3.6
  * http://getbootstrap.com/javascript/#carousel
@@ -5124,7 +5322,7 @@ return Backbone.LocalStorage;
 
 }(jQuery);
 
-},{}],14:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: collapse.js v3.3.6
  * http://getbootstrap.com/javascript/#collapse
@@ -5337,7 +5535,7 @@ return Backbone.LocalStorage;
 
 }(jQuery);
 
-},{}],15:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: dropdown.js v3.3.6
  * http://getbootstrap.com/javascript/#dropdowns
@@ -5504,7 +5702,7 @@ return Backbone.LocalStorage;
 
 }(jQuery);
 
-},{}],16:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: modal.js v3.3.6
  * http://getbootstrap.com/javascript/#modals
@@ -5843,7 +6041,7 @@ return Backbone.LocalStorage;
 
 }(jQuery);
 
-},{}],17:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: popover.js v3.3.6
  * http://getbootstrap.com/javascript/#popovers
@@ -5953,7 +6151,7 @@ return Backbone.LocalStorage;
 
 }(jQuery);
 
-},{}],18:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: scrollspy.js v3.3.6
  * http://getbootstrap.com/javascript/#scrollspy
@@ -6127,7 +6325,7 @@ return Backbone.LocalStorage;
 
 }(jQuery);
 
-},{}],19:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: tab.js v3.3.6
  * http://getbootstrap.com/javascript/#tabs
@@ -6284,7 +6482,7 @@ return Backbone.LocalStorage;
 
 }(jQuery);
 
-},{}],20:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: tooltip.js v3.3.6
  * http://getbootstrap.com/javascript/#tooltip
@@ -6800,7 +6998,7 @@ return Backbone.LocalStorage;
 
 }(jQuery);
 
-},{}],21:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: transition.js v3.3.6
  * http://getbootstrap.com/javascript/#transitions
@@ -9410,7 +9608,7 @@ require('../../js/popover.js')
 require('../../js/scrollspy.js')
 require('../../js/tab.js')
 require('../../js/affix.js')
-},{"../../js/affix.js":10,"../../js/alert.js":11,"../../js/button.js":12,"../../js/carousel.js":13,"../../js/collapse.js":14,"../../js/dropdown.js":15,"../../js/modal.js":16,"../../js/popover.js":17,"../../js/scrollspy.js":18,"../../js/tab.js":19,"../../js/tooltip.js":20,"../../js/transition.js":21}],"jquery":[function(require,module,exports){
+},{"../../js/affix.js":15,"../../js/alert.js":16,"../../js/button.js":17,"../../js/carousel.js":18,"../../js/collapse.js":19,"../../js/dropdown.js":20,"../../js/modal.js":21,"../../js/popover.js":22,"../../js/scrollspy.js":23,"../../js/tab.js":24,"../../js/tooltip.js":25,"../../js/transition.js":26}],"jquery":[function(require,module,exports){
 /*!
  * jQuery JavaScript Library v2.2.3
  * http://jquery.com/
