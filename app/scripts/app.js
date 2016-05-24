@@ -55,6 +55,7 @@ module.exports = Backbone.Marionette.ItemView.extend({
 },{"backbone":"backbone","backbone.marionette":8}],5:[function(require,module,exports){
 var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
+Backbone.Validation = require('backbone.validation');
 var User = require('../models/User');
 var UserView = require('./UserView');
 
@@ -65,6 +66,7 @@ module.exports = Backbone.Marionette.CompositeView.extend({
     ui: {
         inputName: '#name',
         inputAge: '#age',
+        inputs: 'input',
         submitBtn: '#submit'
     },
     events: {
@@ -74,16 +76,32 @@ module.exports = Backbone.Marionette.CompositeView.extend({
         var name = this.ui.inputName.val();
         var age = this.ui.inputAge.val();
         this.model = new User();
+
+        Backbone.Validation.bind(this, {
+            valid: function(view, attr) {
+                var input = view.$('[name=' + attr + ']')
+                input.next('.help-inline').remove();
+            },
+            invalid: function(view, attr, error) {
+                var input = view.$('[name=' + attr + ']')
+                if(input.next('.help-inline').length == 0) {
+                    input.after('<span class=\"help-inline\" style=\"color:red\"></span>');
+                }
+                input.next('.help-inline').text(error);
+            }
+        });
+
         this.model.set({name: name, age: age});
         if(this.model.isValid(true)) {
             this.collection.create(this.model);
+            this.ui.inputs.val('');
             alert('Success!');
         }
     }
 });
 
 
-},{"../models/User":3,"./UserView":4,"backbone":"backbone","backbone.marionette":8}],6:[function(require,module,exports){
+},{"../models/User":3,"./UserView":4,"backbone":"backbone","backbone.marionette":8,"backbone.validation":"backbone.validation"}],6:[function(require,module,exports){
 /**
  * Backbone localStorage Adapter
  * Version 1.1.16
