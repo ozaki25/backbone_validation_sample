@@ -3,6 +3,8 @@
 
 ### サンプルの動かし方
 * cloneするかzipをダウンロードして、app/index.htmlを起動すえれば動きます
+ * 編集せずに動かすだけであればこちらの方がだいぶ軽いです
+   https://github.com/ozaki25/backbone_validation_sample/tree/bootstrap_without_node_modules
 
 ### 前提
 * bootstrapのformを使用している場合のエラーの表示のしかた解説している
