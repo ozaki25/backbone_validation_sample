@@ -109,7 +109,7 @@ var User = require('../models/User');
 
 module.exports = Backbone.Marionette.ItemView.extend({
     className: 'panel panel-success',
-    template: '#basic_form_view',
+    template: '#basic_form_with_tooltip_view',
     ui: {
         inputName: 'input.name',
         inputAge: 'input.age',
