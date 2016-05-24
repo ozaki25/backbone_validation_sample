@@ -22,6 +22,12 @@
 * 入力内容が条件を満たさなければユーザにエラーを伝える
 * 登録したユーザは画面下部に羅列されていく
 
+### やること
+1. modelにバリデーションを定義する
+2. htmlをバリデーションに対応づける
+3. バリデーションの実行部分を作る
+4. バリデーション完了後の処理を作る
+
 ### バリデーションの定義
 * バリデーションの定義はモデルで行う
 https://github.com/ozaki25/backbone_validation_sample/blob/bootstrap/app/scripts/models/User.js#L4
