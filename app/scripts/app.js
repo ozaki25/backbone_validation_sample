@@ -9,6 +9,8 @@ module.exports = Backbone.Collection.extend({
 });
 
 },{"../models/User":3,"backbone":"backbone","backbone.LocalStorage":6}],2:[function(require,module,exports){
+var $ = jQuery = require('jquery');
+require('bootstrap');
 var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
 var Users = require('./collections/Users');
@@ -28,7 +30,7 @@ var App = new Backbone.Marionette.Application({
 
 App.start();
 
-},{"./collections/Users":1,"./views/UsersView":5,"backbone":"backbone","backbone.marionette":8}],3:[function(require,module,exports){
+},{"./collections/Users":1,"./views/UsersView":5,"backbone":"backbone","backbone.marionette":8,"bootstrap":"bootstrap","jquery":"jquery"}],3:[function(require,module,exports){
 var Backbone = require('backbone');
 
 module.exports = Backbone.Model.extend({
