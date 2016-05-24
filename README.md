@@ -82,8 +82,8 @@ http://getbootstrap.com/css/#forms-example
 * BasicFormではシンプルなフォームの場合の例です
 * 入力域の下にエラーメッセージを表示します
   https://github.com/ozaki25/backbone_validation_sample/blob/bootstrap/app/scripts/views/BasicFormView.js#L31
-  
-  ![BasicForm.png](./images/BasicForm.png =150x)
+ 
+ <img src=./images/BasicForm.png height=300px>
 
 #### HorizontalForm
 http://getbootstrap.com/css/#forms-horizontal
@@ -91,20 +91,20 @@ http://getbootstrap.com/css/#forms-horizontal
 * BasicFormと同様に入力域の下にエラーメッセージを表示します
   https://github.com/ozaki25/backbone_validation_sample/blob/bootstrap/app/scripts/views/HorizontalFormView.js#L31
 
-  ![HorizontalForm.png](./images/HorizontalForm.png =150x)
+  <img src=./images/HorizontalForm.png height=300px>
 
 #### InlineForm
 http://getbootstrap.com/css/#forms-inline
 * InlineFormは複数の入力域が横並びの場合の例です
 * それぞれ入力域の右にエラーメッセージを表示します
   https://github.com/ozaki25/backbone_validation_sample/blob/bootstrap/app/scripts/views/InlineFormView.js#L31
-  
-  ![InlineForm.png](./images/InlineForm.png =150x)
+ 
+ <img src=./images/InlineForm.png height=100px>
 
 #### BasicFormWithTooltip
 * 最後はおまけです
 * BasicFormと同じフォームですが、エラーメッセージをツールチップで出す場合の例です
 * 条件を満たしていない入力域にツールチップを付与してそこにエラーメッセージを表示します
   https://github.com/ozaki25/backbone_validation_sample/blob/bootstrap/app/scripts/views/BasicFormWithTooltipView.js#L31
-  
-  ![BasicFormWithTooltip.png](./images/BasicFormWithTooltip.png =150x)
+
+ <img src=./images/BasicFormWithTooltip.png height=300px>
