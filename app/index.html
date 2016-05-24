@@ -2,7 +2,7 @@
 
 <html>
   <head>
-    <title>backbone_moarionette_template</title>
+    <title>backbone-validation-sample</title>
     <link rel="stylesheet"  media="screen" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet"  media="screen" href="./styles/main.css">
     <meta charset="UTF-8">
@@ -10,8 +10,20 @@
   <body>
     <div id="main"></div>
 
-    <script id="test_view" type="text/template">
+    <script id="users_view" type="text/template">
       <h1>Backbone Moarionette Template</h1>
+      <form>
+        <label>Name</label>
+        <input type="text" id="name" name="name">
+        <label>Age</label>
+        <input type="number" id="age" name="age">
+        <button type="button" id="submit">submit</button>
+      </form>
+      <div id="users_list"></div>
+    </script>
+
+    <script id="user_view" type="text/template">
+      Name: <%- name %>, Age: <%- age %>
     </script>
 
     <script src="scripts/app.js"></script>
